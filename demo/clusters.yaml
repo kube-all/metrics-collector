@@ -1,0 +1,14 @@
+- name: demo-jwt
+  code: demo-jwt
+  prometheus:
+    address: http://localhost:9090
+    token: jwt token
+    username: ""
+    password: ""
+- name: demo-basic
+  code: demo-basic
+  prometheus:
+    address: http://localhost:9090
+    token: ""
+    username: basic username
+    password: basic password

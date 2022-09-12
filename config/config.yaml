@@ -1,0 +1,9 @@
+collectors:
+  - cluster
+  - namespace
+  - node
+  - service
+  - pod
+clusterPath: demo/clusters.yaml
+metricsPath: demo/metrics
+

@@ -1,0 +1,59 @@
+name: namespace-metrics
+code: namespace
+description: 'namespace metrics collectors promql'
+cronExpression: '@every 2h'
+promQls:
+  - name: 'deployment number'
+    code: 'DeploymentNumber'
+    query: 'count(kube_deployment_spec_replicas{namespace!=""}!=0) by (namespace)'
+  - name: 'daemonSet number'
+    code: 'DaemonSetNumber'
+    query: 'count(kube_daemonset_status_desired_number_scheduled{namespace!=""}!=0) by (namespace)'
+  - name: 'deploymentConfig number' #TODO prometheus中没搜集该度量指标
+    code: 'DeploymentConfigNumber'
+    query: 'count(kube_deploymentconfig_spec_replicas{namespace!=""}!=0) by (namespace)'
+  - name: 'statefulSet number'
+    code: 'StatefulSetNumber'
+    query: 'count(kube_statefulset_replicas{namespace!=""}!=0) by (namespace)'
+  - name: 'pod number'
+    code: 'PodNumber'
+    query: 'sum(kube_pod_status_phase{namespace!="",phase="Running"}==1) by (namespace)'
+  - name: 'all service cpu request total'
+    code: 'CPURequest'
+    query: 'sum(namespace:kube_pod_container_resource_requests_cpu_cores:sum) by (namespace)'
+  - name: 'all service cpu limit total'
+    code: 'CPULimit'
+    query: 'sum(kube_pod_container_resource_limits_cpu_cores{namespace!=""}) by (namespace)'
+  - name: 'all service memory request total'# 单位G
+    code: 'MemoryRequest'
+    query: 'sum(kube_pod_container_resource_requests_memory_bytes{namespace!=""}/1024/1024/1024) by (namespace)'
+  - name: 'all service memory limit total'
+    code: 'MemoryLimit'
+    query: 'sum(kube_pod_container_resource_limits_memory_bytes{namespace!=""}/1024/1024/1024) by (namespace)'
+  - name: 'max cpu usage in last 1 hours'
+    code: 'CPUUsageMax'
+    query: 'sum(max_over_time(irate(container_cpu_usage_seconds_total{namespace!="",container!="",image!=""}[1m] ) [1h:1m])) by (namespace)'
+  - name: 'avg cpu usage in last 1 hours'
+    code: 'CPUUsageAvg'
+    query: 'avg(avg_over_time(rate(container_cpu_usage_seconds_total{namespace!="",container!="",image!=""}[1m] ) [1h:1m])) by (namespace)'
+  - name: 'min cpu usage in last 1 hours'
+    code: 'CPUUsageMin'
+    query: 'sum(min_over_time(irate(container_cpu_usage_seconds_total{namespace!="",container!="",image!=""}[1m] ) [1h:1m])) by (namespace)'
+  - name: 'max memory usage in last 1 hours'
+    code: 'MemoryUsageMax'
+    query: 'sum(max_over_time(container_memory_working_set_bytes{namespace!="",container!="",image!=""}[1h])/1024/1024/1024) by (namespace)'
+  - name: 'avg memory usage in last 1 hours'
+    code: 'MemoryUsageAvg'
+    query: 'sum(avg_over_time(container_memory_working_set_bytes{namespace!="",container!="",image!=""}[1h])/1024/1024/1024) by (namespace)'
+  - name: 'min memory usage in last 1 hours'
+    code: 'MemoryUsageMin'
+    query: 'sum(min_over_time(container_memory_working_set_bytes{namespace!="",container!="",image!=""}[1h])/1024/1024/1024) by (namespace)'
+  - name:  "PVC count"
+    code: "PVCCount"
+    query: "count(kube_persistentvolumeclaim_info)by(namespace)"
+  - name:  "all Volumes Capacity" #namespace下PVC声明总量
+    code: "VolumeCapacity"
+    query: 'sum(kube_persistentvolumeclaim_resource_requests_storage_bytes/1024/1024/1024) by (namespace)'
+  - name:  "all Volumes Available"#TODO 无度量指标，暂定与总量一致
+    code: "VolumeAvailable"
+    query: 'sum(kube_persistentvolumeclaim_resource_requests_storage_bytes/1024/1024/1024) by (namespace)'
